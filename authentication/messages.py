@@ -7,6 +7,7 @@ MESSAGE_INVALID_PASSWORD = "Invalid password."
 MESSAGE_EMAIL_ALREADY_EXISTS = "Email already exists."
 MESSAGE_INVALID_CREDENTIALS = "Invalid credentials."
 MESSAGE_UNKNOWN_USER = "Unknown user."
+MESSAGE_AUTHORIZATION_HEADER = "Missing Authorization Header"
 
 
 def getMessage(message, argument=None):
@@ -17,3 +18,7 @@ def getMessage(message, argument=None):
 
 def responseMessageJson(message, argument=None, status=400):
     return jsonify(message=getMessage(message, argument)), status
+
+
+def responseAuthorizationHeader(message, status=401):
+    return jsonify(msg=message), status

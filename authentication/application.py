@@ -107,6 +107,9 @@ def refresh():
     identity = get_jwt_identity()
     claims = get_jwt()
 
+    if not claims:
+        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
+
     additionalClaims = {
         "forename": claims["forename"],
         "surname": claims["surname"],
@@ -121,6 +124,22 @@ def refresh():
 @application.route("/delete", methods=["POST"])
 @jwt_required(refresh=False)
 def delete():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+
+    if not claims:
+        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
+
+    user = User.query.join(UserRole).join(Role).filter(
+        and_(
+            User.email == identity,
+            Role.name == "admin"
+        )
+    ).first()
+
+    if not user:
+        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
+
     email = request.json.get("email", "")
 
     if len(email) == 0:
