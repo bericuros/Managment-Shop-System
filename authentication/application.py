@@ -13,6 +13,10 @@ application.config.from_object(Configuration)
 jwt = JWTManager(application)
 
 
+def isEmailValid(email):
+    return re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email)
+
+
 @application.route("/", methods=["GET"])
 def index():
     return Response("Hello world!", status=200)
@@ -37,7 +41,7 @@ def register():
     if isCustomer is None:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "isCustomer")
 
-    if not re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email):
+    if not isEmailValid(email):
         return responseMessageJson(MESSAGE_INVALID_EMAIL)
 
     if len(password) < 8 or \
@@ -59,7 +63,7 @@ def register():
     database.session.add(userRole)
     database.session.commit()
 
-    return Response("Successful registration.", status=200)
+    return Response(status=200)
 
 
 @application.route("/login", methods=["POST"])
@@ -72,7 +76,7 @@ def login():
     if len(password) == 0:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "password")
 
-    if not re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email):
+    if not isEmailValid(email):
         return responseMessageJson(MESSAGE_INVALID_EMAIL)
 
     user = User.query.filter(
@@ -122,11 +126,20 @@ def delete():
     if len(email) == 0:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "email")
 
-    if not re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email):
+    if not isEmailValid(email):
         return responseMessageJson(MESSAGE_INVALID_EMAIL)
 
+    user = User.query.filter(User.email == email).first()
+    if not user:
+        return responseMessageJson(MESSAGE_UNKNOWN_USER)
 
-    return "oh my"
+    userRoles = UserRole.query.filter(UserRole.userId == user.id).all()
+    for userRole in userRoles:
+        database.session.delete(userRole)
+    database.session.delete(user)
+    database.session.commit()
+
+    return Response(status=200)
 
 
 if __name__ == "__main__":
