@@ -97,6 +97,38 @@ def login():
     return jsonify(accessToken=accessToken, refreshToken=refreshToken), 200
 
 
+@application.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+
+    additionalClaims = {
+        "forename": claims["forename"],
+        "surname": claims["surname"],
+        "roles": claims["roles"],
+    }
+
+    accessToken = create_access_token(identity=identity, additional_claims=additionalClaims)
+
+    return jsonify(accessToken=accessToken), 200
+
+
+@application.route("/delete", methods=["POST"])
+@jwt_required(refresh=False)
+def delete():
+    email = request.json.get("email", "")
+
+    if len(email) == 0:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "email")
+
+    if not re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email):
+        return responseMessageJson(MESSAGE_INVALID_EMAIL)
+
+
+    return "oh my"
+
+
 if __name__ == "__main__":
     database.init_app(application)
     application.run(debug=True, port=5002)
