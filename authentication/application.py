@@ -30,14 +30,14 @@ def register():
     surname = request.json.get("surname", "")
     isCustomer = request.json.get("isCustomer", None)
 
-    if len(email) == 0:
-        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "email")
-    if len(password) == 0:
-        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "password")
     if len(forename) == 0:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "forename")
     if len(surname) == 0:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "surname")
+    if len(email) == 0:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "email")
+    if len(password) == 0:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "password")
     if isCustomer is None:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "isCustomer")
 
