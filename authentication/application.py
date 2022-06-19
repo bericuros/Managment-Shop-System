@@ -10,6 +10,7 @@ import re
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
+jwt = JWTManager(application)
 
 
 @application.route("/", methods=["GET"])
@@ -59,6 +60,41 @@ def register():
     database.session.commit()
 
     return Response("Successful registration.", status=200)
+
+
+@application.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email", "")
+    password = request.json.get("password", "")
+
+    if len(email) == 0:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "email")
+    if len(password) == 0:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "password")
+
+    if not re.search(r"^[a-zA-Z0-9_.]+@[a-zA-Z0-9_.]+\.[a-zA-Z]{2,}$", email):
+        return responseMessageJson(MESSAGE_INVALID_EMAIL)
+
+    user = User.query.filter(
+        and_(
+            User.email == email,
+            User.password == password,
+        )
+    ).first()
+
+    if not user:
+        return responseMessageJson(MESSAGE_INVALID_CREDENTIALS)
+
+    additionalClaims = {
+        "forename": user.forename,
+        "surname": user.surname,
+        "roles": [str(role) for role in user.roles],
+    }
+
+    accessToken = create_access_token(identity=user.email, additional_claims=additionalClaims)
+    refreshToken = create_refresh_token(identity=user.email, additional_claims=additionalClaims)
+
+    return jsonify(accessToken=accessToken, refreshToken=refreshToken), 200
 
 
 if __name__ == "__main__":
