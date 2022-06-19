@@ -3,7 +3,6 @@ from datetime import timedelta
 import os
 
 databaseUrl = os.environ["DATABASE_URL"]
-#databaseUrl = "authenticationDatabase"
 
 
 class Configuration:

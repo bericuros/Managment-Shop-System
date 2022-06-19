@@ -11,8 +11,6 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 100
-    cap_add:
-      - SYS_NICE
   adminer:
     image: adminer
     ports:
