@@ -107,7 +107,7 @@ def refresh():
     identity = get_jwt_identity()
     claims = get_jwt()
 
-    if not claims:
+    if not identity:
         return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
 
     additionalClaims = {
@@ -125,9 +125,8 @@ def refresh():
 @jwt_required(refresh=False)
 def delete():
     identity = get_jwt_identity()
-    claims = get_jwt()
 
-    if not claims:
+    if not identity:
         return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
 
     user = User.query.join(UserRole).join(Role).filter(
@@ -163,4 +162,4 @@ def delete():
 
 if __name__ == "__main__":
     database.init_app(application)
-    application.run(debug=True, port=5002)
+    application.run(debug=True, host="0.0.0.0", port=5002)
