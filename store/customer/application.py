@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
     create_refresh_token, get_jwt, get_jwt_identity
 from sqlalchemy import and_
 from store.messages import *
+from check import role_check
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -19,6 +20,7 @@ def index():
 
 @application.route("/search", methods=["GET"])
 @jwt_required(refresh=False)
+@role_check(role="customer")
 def search():
     claims = get_jwt()
     if not claims:
@@ -56,6 +58,7 @@ def search():
 
 @application.route("/order", methods=["POST"])
 @jwt_required(refresh=False)
+@role_check(role="customer")
 def order():
     claims = get_jwt()
     if not claims:

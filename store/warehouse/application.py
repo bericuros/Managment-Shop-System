@@ -9,6 +9,7 @@ from store.messages import *
 import io
 import csv
 from redis import Redis
+from check import role_check
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -22,6 +23,7 @@ def index():
 
 @application.route("/update", methods=["POST"])
 @jwt_required(refresh=False)
+@role_check(role="warehouse")
 def update():
     keys = request.files.keys()
     if not ("file" in keys):

@@ -1,6 +1,7 @@
 from functools import wraps
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from flask import Response
+from messages import *
 
 
 def role_check(role):
@@ -12,6 +13,6 @@ def role_check(role):
             if ("roles" in claims) and (role in claims["roles"]):
                 return function(*arguments, **keyword_arguments)
             else:
-                return Response(status=403)
+                return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
         return decorator
     return inner_role
