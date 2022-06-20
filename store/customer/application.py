@@ -5,6 +5,7 @@ from email.utils import parseaddr
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
     create_refresh_token, get_jwt, get_jwt_identity
 from sqlalchemy import and_
+from store.messages import *
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -19,10 +20,19 @@ def index():
 @application.route("/search", methods=["GET"])
 @jwt_required(refresh=False)
 def search():
+    claims = get_jwt()
+    if not claims:
+        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
+
     name = request.args.get("name", "")
     category = request.args.get("category", "")
 
-    categories = Category.query.filter(Category.name.like(f"%{category}%")).all()
+    categories = Category.query.join(ProductCategory).join(Product).filter(
+        and_(
+            Product.name.like(f"%{name}%"),
+            Category.name.like(f"%{category}%"),
+        )
+    ).all()
     products = Product.query.join(ProductCategory).join(Category).filter(
         and_(
             Product.name.like(f"%{name}%"),
@@ -45,7 +55,44 @@ def search():
 
 
 @application.route("/order", methods=["POST"])
+@jwt_required(refresh=False)
 def order():
+    claims = get_jwt()
+    if not claims:
+        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
+
+    requests = request.json.get("requests", None)
+    if not requests:
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "requests")
+
+    for i in range(len(requests)):
+        id = requests[i].get("id", None)
+        if not id:
+            return responseMessageJson(MESSAGE_PRODUCT_ID_MISSING_REQUEST, str(i))
+
+    for i in range(len(requests)):
+        quantity = requests[i].get("quantity", None)
+        if not quantity:
+            return responseMessageJson(MESSAGE_PRODUCT_QUANTITY_MISSING_REQUEST, str(i))
+
+    for i in range(len(requests)):
+        id = requests[i].get("id", 0)
+        if id <= 0:
+            return responseMessageJson(MESSAGE_INVALID_PRODUCT_ID_REQUEST, str(i))
+
+    for i in range(len(requests)):
+        quantity = requests[i].get("quantity", 0)
+        if quantity <= 0:
+            return responseMessageJson(MESSAGE_INVALID_PRODUCT_QUANTITY_REQUEST, str(i))
+
+    for i in range(len(requests)):
+        id = requests[i].get("id")
+        product = Product.query.filter(Product.id == id).first()
+        if not product:
+            return responseMessageJson(MESSAGE_INVALID_PRODUCT_REQUEST, str(i))
+
+    # TODO
+
     return "TODO"
 
 
