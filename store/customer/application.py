@@ -17,6 +17,7 @@ def index():
 
 
 @application.route("/search", methods=["GET"])
+@jwt_required(refresh=False)
 def search():
     name = request.args.get("name", "")
     category = request.args.get("category", "")
