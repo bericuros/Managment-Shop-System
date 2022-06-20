@@ -16,6 +16,21 @@ def index():
     return "hi"
 
 
+@application.route("/search", methods=["GET"])
+def search():
+    return "TODO"
+
+
+@application.route("/order", methods=["POST"])
+def order():
+    return "TODO"
+
+
+@application.route("/status", methods=["GET"])
+def status():
+    return "TODO"
+
+
 if __name__ == "__main__":
     database.init_app(application)
     application.run(debug=True, host="0.0.0.0", port=5004)
