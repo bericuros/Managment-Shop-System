@@ -14,8 +14,8 @@ def calculatePrice(currentPrice, currentQuantity, deliveryPrice, deliveryQuantit
 if __name__ == "__main__":
     database.init_app(application)
 
-    with application.app_context() as context:
-        while True:
+    while True:
+        with application.app_context() as context:
             with Redis(Configuration.REDIS_HOST) as redis:
                 print("Waiting...")
 
