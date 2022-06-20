@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from store.messages import *
 import io
 import csv
+from redis import Redis
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -50,9 +51,11 @@ def update():
         if float(rows[i][3]) <= 0:
             return responseMessageJson(MESSAGE_INCORRECT_PRICE, str(i))
 
+    with Redis(Configuration.REDIS_HOST) as redis:
+        for row in rows:
+            redis.rpush(Configuration.REDIS_PRODUCTS, *row)
 
-
-    return "TODO"
+    return Response(status=200)
 
 
 if __name__ == "__main__":
