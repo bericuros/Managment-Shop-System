@@ -10,10 +10,19 @@ import io
 import csv
 from redis import Redis
 from check import role_check
+import re
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
 jwt = JWTManager(application)
+
+
+def isQuantityValid(quantity):
+    return re.search(r"^[1-9]+[0-9]*$", quantity)
+
+
+def isPriceValid(price):
+    return re.search(r"^[0-9]+[.]?[0-9]*$", price)
 
 
 @application.route("/", methods=["GET"])
@@ -46,11 +55,11 @@ def update():
             return responseMessageJson(MESSAGE_INCORRECT_NUMBER_VALUES, str(i))
 
     for i in range(len(rows)):
-        if int(rows[i][2]) <= 0:
+        if not isQuantityValid(rows[i][2]) or int(rows[i][2]) <= 0:
             return responseMessageJson(MESSAGE_INCORRECT_QUANTITY, str(i))
 
     for i in range(len(rows)):
-        if float(rows[i][3]) <= 0:
+        if not isPriceValid(rows[i][3]) or float(rows[i][3]) <= 0:
             return responseMessageJson(MESSAGE_INCORRECT_PRICE, str(i))
 
     with Redis(Configuration.REDIS_HOST) as redis:
