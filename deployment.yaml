@@ -35,4 +35,4 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
     ports:
-      - '5003:3306'
+      - '5001:3306'
