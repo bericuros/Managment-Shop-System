@@ -11,6 +11,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 100
+    volumes:
+      - dataAuthenticationDatabase:/var/lib/mysql
   adminer:
     image: adminer
     ports:
@@ -40,6 +42,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 100
+    volumes:
+      - dataStoreDatabase:/var/lib/mysql
   redis:
     image: redis
     ports:
@@ -86,3 +90,7 @@ services:
       - REDIS_URL=redis
     depends_on:
       - storeDBMigration
+
+volumes:
+  dataAuthenticationDatabase:
+  dataStoreDatabase:
