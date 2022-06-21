@@ -1,5 +1,5 @@
 from flask import Flask, request, Response, jsonify
-from configuration import Configuration
+from configurationDatabase import Configuration
 from models import database, Product, ProductOrder, ProductCategory, Order, Category
 from email.utils import parseaddr
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \

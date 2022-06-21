@@ -1,5 +1,5 @@
 from flask import Flask
-from configuration import Configuration
+from configurationDatabase import Configuration
 from flask_migrate import Migrate, init, migrate, upgrade
 from models import database
 from sqlalchemy_utils import database_exists, create_database

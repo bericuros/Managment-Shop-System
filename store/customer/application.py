@@ -1,7 +1,7 @@
 import datetime
 
 from flask import Flask, request, Response, jsonify
-from configuration import Configuration
+from configurationDatabase import Configuration
 from models import database, Order, ProductOrder, Product, ProductCategory, Category
 from email.utils import parseaddr
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \

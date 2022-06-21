@@ -4,7 +4,7 @@ RUN mkdir -p /opt/src/store
 WORKDIR /opt/src/store
 
 COPY store/admin/application.py ./admin.py
-COPY store/configuration.py ./configuration.py
+COPY store/configurationDatabase.py ./configurationDatabase.py
 COPY store/models.py ./models.py
 COPY messages.py ./messages.py
 COPY check.py ./check.py
