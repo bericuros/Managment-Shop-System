@@ -113,9 +113,7 @@ def order():
         database.session.add(productOrder)
         database.session.commit()
 
-    # print(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
-
-    return Response(status=200)
+    return jsonify(id=order.id), 200
 
 
 @application.route("/status", methods=["GET"])
