@@ -119,8 +119,30 @@ def order():
 
 
 @application.route("/status", methods=["GET"])
+@jwt_required(refresh=False)
+@role_check(role="customer")
 def status():
-    return "TODO"
+    identity = get_jwt_identity()
+    orders = Order.query.filter(Order.identity == identity).all()
+
+    jsonOrders = []
+    for order in orders:
+        productOrders = ProductOrder.query.filter(ProductOrder.orderId == order.id).all()
+        jsonProducts = []
+        notReceivedCount = 0
+        for productOrder in productOrders:
+            product = Product.query.filter(Product.id == productOrder.productId).first()
+            data = {"categories": [elem.name for elem in product.categories], "name": product.name,
+                    "price": productOrder.price, "received": productOrder.received,
+                    "requested": productOrder.requested}
+            jsonProducts.append(data)
+            notReceivedCount += productOrder.requested - productOrder.received
+        status = "PENDING" if notReceivedCount else "COMPLETE"
+        data = {"products": jsonProducts, "price": order.price, "status": status,
+                "timestamp": order.timestamp.replace(microsecond=0).isoformat() + "Z"}
+        jsonOrders.append(data)
+
+    return jsonify(orders=jsonOrders), 200
 
 
 if __name__ == "__main__":
