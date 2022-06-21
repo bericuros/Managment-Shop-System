@@ -15,9 +15,18 @@ if not database_exists(Configuration.SQLALCHEMY_DATABASE_URI):
 database.init_app(application)
 
 with application.app_context() as context:
-    init()
-    migrate(message="Initial migration.")
-    upgrade()
+    try:
+        init()
+    except:
+        dummy = 0
+    try:
+        migrate(message="Initial migration.")
+    except:
+        dummy = 0
+    try:
+        upgrade()
+    except:
+        dummy = 0
 
     adminRole = Role(name="admin")
     customerRole = Role(name="customer")
