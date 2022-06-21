@@ -59,3 +59,11 @@ services:
       - '5003:5003'
     depends_on:
       - storeDBMigration
+  storecustomer:
+    image: storecustomer
+    environment:
+      - DATABASE_URL=storeDatabase
+    ports:
+      - '5004:5004'
+    depends_on:
+      - storeDBMigration
