@@ -32,6 +32,7 @@ class ProductOrder(database.Model):
     orderId = database.Column(database.Integer, database.ForeignKey("orders.id"), nullable=False)
     requested = database.Column(database.Integer, nullable=False)
     received = database.Column(database.Integer, nullable=False)
+    price = database.Column(database.Float, nullable=False)
 
     def __repr__(self):
         return f"({self.productId}, {self.orderId}, {self.received}/{self.requested})"

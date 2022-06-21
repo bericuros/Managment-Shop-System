@@ -7,10 +7,15 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
 from sqlalchemy import and_
 from store.messages import *
 from check import role_check
+import re
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
 jwt = JWTManager(application)
+
+
+def isQuantityValid(quantity):
+    return re.search(r"^[1-9]+[0-9]*$", quantity)
 
 
 @application.route("/", methods=["GET"])
@@ -56,10 +61,6 @@ def search():
 @jwt_required(refresh=False)
 @role_check(role="customer")
 def order():
-    claims = get_jwt()
-    if not claims:
-        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
-
     requests = request.json.get("requests", None)
     if not requests:
         return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "requests")
@@ -76,12 +77,12 @@ def order():
 
     for i in range(len(requests)):
         id = requests[i].get("id", 0)
-        if id <= 0:
+        if not isQuantityValid(str(id)) or id <= 0:
             return responseMessageJson(MESSAGE_INVALID_PRODUCT_ID_REQUEST, str(i))
 
     for i in range(len(requests)):
         quantity = requests[i].get("quantity", 0)
-        if quantity <= 0:
+        if not isQuantityValid(str(quantity)) or quantity <= 0:
             return responseMessageJson(MESSAGE_INVALID_PRODUCT_QUANTITY_REQUEST, str(i))
 
     for i in range(len(requests)):
