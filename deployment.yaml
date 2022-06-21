@@ -79,3 +79,10 @@ services:
       - '5006:5006'
     depends_on:
       - storeDBMigration
+  storedaemon:
+    image: storedaemon
+    environment:
+      - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
+    depends_on:
+      - storeDBMigration

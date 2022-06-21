@@ -1,6 +1,6 @@
 from flask import Flask, request, Response, jsonify
-from store.configuration import Configuration
-from store.models import database, Product, ProductOrder, ProductCategory, Order, Category
+from configuration import Configuration
+from models import database, Product, ProductOrder, ProductCategory, Order, Category
 from redis import Redis
 from sqlalchemy import and_
 
