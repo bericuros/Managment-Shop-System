@@ -1,6 +1,6 @@
 from flask import Flask, request, Response, jsonify
-from store.configuration import Configuration
-from store.models import database, Product, ProductOrder, ProductCategory, Order, Category
+from configuration import Configuration
+from models import database, Product, ProductOrder, ProductCategory, Order, Category
 from email.utils import parseaddr
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
     create_refresh_token, get_jwt, get_jwt_identity
