@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
 from sqlalchemy import and_
 from store.messages import *
 from check import role_check
+from sqlalchemy import func
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -39,7 +40,14 @@ def productStatistics():
 @jwt_required(refresh=False)
 @role_check(role="admin")
 def categoryStatistics():
-    return "TODO"
+    statistics = []
+    count = func.sum(ProductOrder.received)
+    categories = Category.query.join(ProductCategory).join(Product).\
+        join(ProductOrder).group_by(Category).with_entities(Category, count). \
+        order_by(count.desc()).order_by(Category.name).all()
+    for category in categories:
+        statistics.append(category[0].name)
+    return jsonify(statistics=statistics), 200
 
 
 if __name__ == "__main__":
