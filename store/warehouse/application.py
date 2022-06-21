@@ -5,7 +5,7 @@ from email.utils import parseaddr
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
     create_refresh_token, get_jwt, get_jwt_identity
 from sqlalchemy import and_
-from store.messages import *
+from messages import *
 import io
 import csv
 from redis import Redis

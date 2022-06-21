@@ -2,7 +2,20 @@
 from flask import jsonify
 
 MESSAGE_AUTHORIZATION_HEADER = "Missing Authorization Header"
-
+MESSAGE_FIELD_IS_MISSING = "Field {} is missing."
+MESSAGE_INCORRECT_NUMBER_VALUES = "Incorrect number of values on line {}."
+MESSAGE_INCORRECT_QUANTITY = "Incorrect quantity on line {}."
+MESSAGE_INCORRECT_PRICE = "Incorrect price on line {}."
+MESSAGE_PRODUCT_ID_MISSING_REQUEST = "Product id is missing for request number {}."
+MESSAGE_PRODUCT_QUANTITY_MISSING_REQUEST = "Product quantity is missing for request number {}."
+MESSAGE_INVALID_PRODUCT_ID_REQUEST = "Invalid product id for request number {}."
+MESSAGE_INVALID_PRODUCT_QUANTITY_REQUEST = "Invalid product quantity for request number {}."
+MESSAGE_INVALID_PRODUCT_REQUEST = "Invalid product for request number {}."
+MESSAGE_INVALID_EMAIL = "Invalid email."
+MESSAGE_INVALID_PASSWORD = "Invalid password."
+MESSAGE_EMAIL_ALREADY_EXISTS = "Email already exists."
+MESSAGE_INVALID_CREDENTIALS = "Invalid credentials."
+MESSAGE_UNKNOWN_USER = "Unknown user."
 
 def getMessage(message, argument=None):
     if argument:
