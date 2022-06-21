@@ -107,7 +107,9 @@ def order():
         product = Product.query.filter(Product.id == id).first()
         order.price += product.price * productDict[id]
         productOrder = ProductOrder(productId=product.id, orderId=order.id,
-                                    requested=productDict[id], received=0, price=product.price)
+                                    requested=productDict[id], received=min(productDict[id], product.quantity),
+                                    price=product.price)
+        product.quantity = max(product.quantity - productDict[id], 0)
         database.session.add(productOrder)
         database.session.commit()
 
