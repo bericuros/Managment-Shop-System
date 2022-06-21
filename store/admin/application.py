@@ -41,11 +41,10 @@ def productStatistics():
 @role_check(role="admin")
 def categoryStatistics():
     statistics = []
-    count = func.sum(ProductOrder.received)
+    count = func.sum(ProductOrder.requested)
     categories = Category.query.join(ProductCategory).join(Product).\
         outerjoin(ProductOrder).group_by(Category).with_entities(Category, count). \
         order_by(count.desc()).order_by(Category.name).all()
-    print(str(categories))
     for category in categories:
         statistics.append(category[0].name)
     return jsonify(statistics=statistics), 200
