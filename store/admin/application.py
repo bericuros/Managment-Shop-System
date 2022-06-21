@@ -29,7 +29,7 @@ def productStatistics():
         data = {"name": product.name, "sold": 0, "waiting": 0}
         productOrders = ProductOrder.query.filter(ProductOrder.productId == product.id)
         for productOrder in productOrders:
-            data["sold"] += productOrder.received
+            data["sold"] += productOrder.requested
             data["waiting"] += productOrder.requested - productOrder.received
         if data["sold"]:
             statistics.append(data)
@@ -43,8 +43,9 @@ def categoryStatistics():
     statistics = []
     count = func.sum(ProductOrder.received)
     categories = Category.query.join(ProductCategory).join(Product).\
-        join(ProductOrder).group_by(Category).with_entities(Category, count). \
+        outerjoin(ProductOrder).group_by(Category).with_entities(Category, count). \
         order_by(count.desc()).order_by(Category.name).all()
+    print(str(categories))
     for category in categories:
         statistics.append(category[0].name)
     return jsonify(statistics=statistics), 200

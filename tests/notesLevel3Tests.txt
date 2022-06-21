@@ -1,0 +1,3 @@
+FOR RUNNING LEVEL3 TESTS:
+    - python main.py --type level3 --with-authentication --authentication-address http://127.0.0.1:5002 --customer-address http://127.0.0.1:5004 --warehouse-address http://127.0.0.1:5006 --administrator-address http://127.0.0.1:5003
+    - drop "store" databse beforehand
