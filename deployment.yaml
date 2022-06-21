@@ -48,6 +48,7 @@ services:
     image: storedbmigration
     environment:
       - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
     depends_on:
       storeDatabase:
         condition: service_healthy
@@ -55,6 +56,7 @@ services:
     image: storeadmin
     environment:
       - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
     ports:
       - '5003:5003'
     depends_on:
@@ -63,7 +65,17 @@ services:
     image: storecustomer
     environment:
       - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
     ports:
       - '5004:5004'
+    depends_on:
+      - storeDBMigration
+  storewarehouse:
+    image: storewarehouse
+    environment:
+      - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
+    ports:
+      - '5006:5006'
     depends_on:
       - storeDBMigration
