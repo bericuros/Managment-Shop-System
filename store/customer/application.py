@@ -22,10 +22,6 @@ def index():
 @jwt_required(refresh=False)
 @role_check(role="customer")
 def search():
-    claims = get_jwt()
-    if not claims:
-        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
-
     name = request.args.get("name", "")
     category = request.args.get("category", "")
 
