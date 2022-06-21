@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, \
 from sqlalchemy import and_
 from messages import *
 import re
+from check import role_check
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -107,9 +108,6 @@ def refresh():
     identity = get_jwt_identity()
     claims = get_jwt()
 
-    if not identity:
-        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
-
     additionalClaims = {
         "forename": claims["forename"],
         "surname": claims["surname"],
@@ -123,22 +121,8 @@ def refresh():
 
 @application.route("/delete", methods=["POST"])
 @jwt_required(refresh=False)
+@role_check(role="admin")
 def delete():
-    identity = get_jwt_identity()
-
-    if not identity:
-        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
-
-    user = User.query.join(UserRole).join(Role).filter(
-        and_(
-            User.email == identity,
-            Role.name == "admin"
-        )
-    ).first()
-
-    if not user:
-        return responseAuthorizationHeader(MESSAGE_AUTHORIZATION_HEADER)
-
     email = request.json.get("email", "")
 
     if len(email) == 0:
