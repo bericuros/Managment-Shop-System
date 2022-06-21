@@ -2,6 +2,7 @@ from flask import Flask, request, Response, jsonify
 from store.configuration import Configuration
 from store.models import database, Product, ProductOrder, ProductCategory, Order, Category
 from redis import Redis
+from sqlalchemy import and_
 
 application = Flask(__name__)
 application.config.from_object(Configuration)
@@ -55,7 +56,20 @@ if __name__ == "__main__":
                         database.session.add(productCategory)
                         database.session.commit()
 
-                # TODO
+                productOrders = ProductOrder.query.filter(
+                    and_(
+                        ProductOrder.productId == product.id,
+                        ProductOrder.requested != ProductOrder.received
+                    )
+                ).order_by(ProductOrder.orderId).all()
+                for productOrder in productOrders:
+                    needs = productOrder.requested - productOrder.received
+                    productOrder.received += min(needs, product.quantity)
+                    product.quantity = max(product.quantity - needs, 0)
+                    if product.quantity == 0:
+                        break
+                database.session.commit()
+
 
 
 
