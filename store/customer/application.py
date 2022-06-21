@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Flask, request, Response, jsonify
 from store.configuration import Configuration
 from store.models import database, Order, ProductOrder, Product, ProductCategory, Category
@@ -91,9 +93,27 @@ def order():
         if not product:
             return responseMessageJson(MESSAGE_INVALID_PRODUCT_REQUEST, str(i))
 
-    # TODO
+    order = Order(identity=get_jwt_identity(), price=0, timestamp=datetime.datetime.utcnow())
+    database.session.add(order)
+    database.session.commit()
 
-    return "TODO"
+    productIdSet = {int(requests[i].get("id")) for i in range(len(requests))}
+    productDict = {}
+    for productId in productIdSet:
+        productDict[productId] = 0
+    for i in range(len(requests)):
+        productDict[int(requests[i].get("id"))] += int(requests[i].get("quantity"))
+    for id in productDict:
+        product = Product.query.filter(Product.id == id).first()
+        order.price += product.price * productDict[id]
+        productOrder = ProductOrder(productId=product.id, orderId=order.id,
+                                    requested=productDict[id], received=0, price=product.price)
+        database.session.add(productOrder)
+        database.session.commit()
+
+    # print(datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z")
+
+    return Response(status=200)
 
 
 @application.route("/status", methods=["GET"])
