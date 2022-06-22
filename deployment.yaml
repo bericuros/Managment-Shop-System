@@ -7,10 +7,6 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     ports:
       - '3306:3306'
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 100
     volumes:
       - dataAuthenticationDatabase:/var/lib/mysql
     networks:
@@ -26,17 +22,12 @@ services:
     image: authdbmigration
     environment:
       - DATABASE_URL=authenticationDatabase
-    depends_on:
-      authenticationDatabase:
-        condition: service_healthy
     networks:
       - netAuthenticationDatabase
   authentication:
     image: authentication
     environment:
       - DATABASE_URL=authenticationDatabase
-    depends_on:
-      - authDBMigration
     ports:
       - '5002:5002'
     networks:
@@ -47,10 +38,6 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     ports:
       - '5001:3306'
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 100
     volumes:
       - dataStoreDatabase:/var/lib/mysql
     networks:
@@ -65,9 +52,6 @@ services:
     image: storedbmigration
     environment:
       - DATABASE_URL=storeDatabase
-    depends_on:
-      storeDatabase:
-        condition: service_healthy
     networks:
       - netStoreDatabase
   storeadmin:
@@ -76,8 +60,6 @@ services:
       - DATABASE_URL=storeDatabase
     ports:
       - '5003:5003'
-    depends_on:
-      - storeDBMigration
     networks:
       - netStoreDatabase
   storecustomer:
@@ -86,8 +68,6 @@ services:
       - DATABASE_URL=storeDatabase
     ports:
       - '5004:5004'
-    depends_on:
-      - storeDBMigration
     networks:
       - netStoreDatabase
   storewarehouse:
@@ -96,8 +76,6 @@ services:
       - REDIS_URL=redis
     ports:
       - '5006:5006'
-    depends_on:
-      - storeDBMigration
     networks:
       - netRedis
   storedaemon:
@@ -105,8 +83,6 @@ services:
     environment:
       - DATABASE_URL=storeDatabase
       - REDIS_URL=redis
-    depends_on:
-      - storeDBMigration
     networks:
       - netStoreDatabase
       - netRedis
