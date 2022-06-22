@@ -13,10 +13,15 @@ services:
       retries: 100
     volumes:
       - dataAuthenticationDatabase:/var/lib/mysql
+    networks:
+      - netAuthenticationDatabase
   adminer:
     image: adminer
     ports:
       - '8080:8080'
+    networks:
+      - netAuthenticationDatabase
+      - netStoreDatabase
   authDBMigration:
     image: authdbmigration
     environment:
@@ -24,6 +29,8 @@ services:
     depends_on:
       authenticationDatabase:
         condition: service_healthy
+    networks:
+      - netAuthenticationDatabase
   authentication:
     image: authentication
     environment:
@@ -32,6 +39,8 @@ services:
       - authDBMigration
     ports:
       - '5002:5002'
+    networks:
+      - netAuthenticationDatabase
   storeDatabase:
     image: mysql
     environment:
@@ -44,10 +53,14 @@ services:
       retries: 100
     volumes:
       - dataStoreDatabase:/var/lib/mysql
+    networks:
+      - netStoreDatabase
   redis:
     image: redis
     ports:
       - '6379:6379'
+    networks:
+      - netRedis
   storeDBMigration:
     image: storedbmigration
     environment:
@@ -55,6 +68,8 @@ services:
     depends_on:
       storeDatabase:
         condition: service_healthy
+    networks:
+      - netStoreDatabase
   storeadmin:
     image: storeadmin
     environment:
@@ -63,6 +78,8 @@ services:
       - '5003:5003'
     depends_on:
       - storeDBMigration
+    networks:
+      - netStoreDatabase
   storecustomer:
     image: storecustomer
     environment:
@@ -71,6 +88,8 @@ services:
       - '5004:5004'
     depends_on:
       - storeDBMigration
+    networks:
+      - netStoreDatabase
   storewarehouse:
     image: storewarehouse
     environment:
@@ -79,6 +98,8 @@ services:
       - '5006:5006'
     depends_on:
       - storeDBMigration
+    networks:
+      - netRedis
   storedaemon:
     image: storedaemon
     environment:
@@ -86,7 +107,15 @@ services:
       - REDIS_URL=redis
     depends_on:
       - storeDBMigration
+    networks:
+      - netStoreDatabase
+      - netRedis
 
 volumes:
   dataAuthenticationDatabase:
   dataStoreDatabase:
+
+networks:
+  netAuthenticationDatabase:
+  netStoreDatabase:
+  netRedis:
