@@ -1,0 +1,121 @@
+#  Docker Swarm:
+#
+#  1. napravimo stack.yaml fajl
+#      1.1 u njega prekopiramo sadrzaj deployment.yaml fajla
+#      1.2 za svaki network dodamo 'driver: overlay'
+#      1.3 obrisemo depends_on deo u svakom servisu
+#      1.4 podesimo odgovarajuci broj replika:
+#            deploy:
+#            replicas: BROJ_REPLIKA
+#
+#  2. otvorimo terminal
+#      2.1 docker swarm init --advertise-addr 127.0.0.1
+#      2.2 docker stack deploy --compose-file stack.yaml myappstack
+#
+#  3. zatvorimo kontejnere
+#      1.1 docker swarm leave --force
+
+version: '3'
+
+services:
+  authenticationDatabase:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - dataAuthenticationDatabase:/var/lib/mysql
+    networks:
+      - netAuthenticationDatabase
+  adminer:
+    image: adminer
+    ports:
+      - '8080:8080'
+    networks:
+      - netAuthenticationDatabase
+      - netStoreDatabase
+  authDBMigration:
+    image: authdbmigration
+    environment:
+      - DATABASE_URL=authenticationDatabase
+    networks:
+      - netAuthenticationDatabase
+  authentication:
+    image: authentication
+    environment:
+      - DATABASE_URL=authenticationDatabase
+    ports:
+      - '5002:5002'
+    networks:
+      - netAuthenticationDatabase
+  storeDatabase:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '5001:3306'
+    volumes:
+      - dataStoreDatabase:/var/lib/mysql
+    networks:
+      - netStoreDatabase
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - netRedis
+  storeDBMigration:
+    image: storedbmigration
+    environment:
+      - DATABASE_URL=storeDatabase
+    networks:
+      - netStoreDatabase
+  storeadmin:
+    image: storeadmin
+    environment:
+      - DATABASE_URL=storeDatabase
+    ports:
+      - '5003:5003'
+    networks:
+      - netStoreDatabase
+  storecustomer:
+    image: storecustomer
+    environment:
+      - DATABASE_URL=storeDatabase
+    ports:
+      - '5004:5004'
+    networks:
+      - netStoreDatabase
+    deploy:
+      replicas: 3
+  storewarehouse:
+    image: storewarehouse
+    environment:
+      - REDIS_URL=redis
+    ports:
+      - '5006:5006'
+    networks:
+      - netRedis
+    deploy:
+      replicas: 3
+  storedaemon:
+    image: storedaemon
+    environment:
+      - DATABASE_URL=storeDatabase
+      - REDIS_URL=redis
+    networks:
+      - netStoreDatabase
+      - netRedis
+
+volumes:
+  dataAuthenticationDatabase:
+  dataStoreDatabase:
+
+networks:
+  netAuthenticationDatabase:
+    driver: overlay
+  netStoreDatabase:
+    driver: overlay
+  netRedis:
+    driver: overlay
