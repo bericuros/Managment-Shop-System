@@ -40,7 +40,7 @@ def update():
 
     file = request.files["file"]
     if not file:
-        responseMessageJson(MESSAGE_FIELD_IS_MISSING, "file")
+        return responseMessageJson(MESSAGE_FIELD_IS_MISSING, "file")
 
     content = file.stream.read().decode("utf-8")
     stream = io.StringIO(content)
